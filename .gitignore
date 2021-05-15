@@ -1,0 +1,5 @@
+/target/
+student-services.iml
+.idea/
+.gitignore
+.DS_Store
