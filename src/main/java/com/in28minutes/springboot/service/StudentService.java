@@ -1,80 +1,49 @@
 package com.in28minutes.springboot.service;
 
-import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.springframework.stereotype.Component;
-
 import com.in28minutes.springboot.model.Course;
 import com.in28minutes.springboot.model.Student;
+import com.in28minutes.springboot.repository.StudentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-@Component
+import java.security.SecureRandom;
+import java.util.List;
+import java.util.Optional;
+
+@Service
 public class StudentService {
 
-	private static List<Student> students = new ArrayList<>();
-
-	static {
-		//Initialize Data
-		Course course1 = new Course("Course1", "Spring", "10 Steps", Arrays
-				.asList("Learn Maven", "Import Project", "First Example",
-						"Second Example"));
-		Course course2 = new Course("Course2", "Spring MVC", "10 Examples",
-				Arrays.asList("Learn Maven", "Import Project", "First Example",
-						"Second Example"));
-		Course course3 = new Course("Course3", "Spring Boot", "6K Students",
-				Arrays.asList("Learn Maven", "Learn Spring",
-						"Learn Spring MVC", "First Example", "Second Example"));
-		Course course4 = new Course("Course4", "Maven",
-				"Most popular maven course on internet!", Arrays.asList(
-						"Pom.xml", "Build Life Cycle", "Parent POM",
-						"Importing into Eclipse"));
-
-		Student ranga = new Student("Student1", "Ranga Karanam",
-				"Hiker, Programmer and Architect", new ArrayList<>(Arrays
-						.asList(course1, course2, course3, course4)));
-
-		Student satish = new Student("Student2", "Satish T",
-				"Hiker, Programmer and Architect", new ArrayList<>(Arrays
-						.asList(course1, course2, course3, course4)));
-
-		students.add(ranga);
-		students.add(satish);
-	}
+	@Autowired
+	StudentRepository studentRepository;
 
 	public List<Student> retrieveAllStudents() {
-		return students;
+		return studentRepository.findAll();
 	}
 
-	public Student retrieveStudent(String studentId) {
-		for (Student student : students) {
-			if (student.getId().equals(studentId)) {
-				return student;
-			}
-		}
-		return null;
+	public Optional<Student> retrieveStudent(String studentId) {
+		return studentRepository.findById(Long.parseLong(studentId));
 	}
 
-	public List<Course> retrieveCourses(String studentId) {
-		Student student = retrieveStudent(studentId);
+	public List<Course> retrieveCourses(String studentId) throws Exception {
+		Optional<Student> student = retrieveStudent(studentId);
 
-		if (student == null) {
-			return null;
+		if (student.isEmpty()) {
+			throw new Exception("ERROR! No student found for id : "+studentId);
 		}
 
-		return student.getCourses();
+		return student.get().getCourses();
 	}
 
-	public Course retrieveCourse(String studentId, String courseId) {
-		Student student = retrieveStudent(studentId);
+	public Course retrieveCourse(Long studentId, Long courseId) throws Exception {
+		Optional<Student> student = retrieveStudent(studentId.toString());
 
-		if (student == null) {
-			return null;
+		if (student.isEmpty()) {
+			throw new Exception("ERROR! No student found for id : "+studentId);
 		}
 
-		for (Course course : student.getCourses()) {
+		List<Course> courses = student.get().getCourses();
+
+		for (Course course : courses) {
 			if (course.getId().equals(courseId)) {
 				return course;
 			}
@@ -85,17 +54,14 @@ public class StudentService {
 
 	private SecureRandom random = new SecureRandom();
 
-	public Course addCourse(String studentId, Course course) {
-		Student student = retrieveStudent(studentId);
+	public Course addCourse(Long studentId, Course course) throws Exception {
+		Optional<Student> student = retrieveStudent(studentId.toString());
 
-		if (student == null) {
-			return null;
+		if (student.isEmpty()) {
+			throw new Exception("ERROR! No student found for id : "+studentId);
 		}
 
-		String randomId = new BigInteger(130, random).toString(32);
-		course.setId(randomId);
-
-		student.getCourses().add(course);
+		student.get().getCourses().add(course);
 
 		return course;
 	}

@@ -1,23 +1,26 @@
 package com.in28minutes.springboot.model;
 
-import java.util.List;
+import javax.persistence.*;
 
+@Entity
 public class Course {
-	private String id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
+
+	@Column(nullable = false)
 	private String name;
+
+	@Column(nullable = false)
 	private String description;
-	private List<String> steps;
 
-	// Needed by Caused by: com.fasterxml.jackson.databind.JsonMappingException:
-	// Can not construct instance of com.in28minutes.springboot.model.Course:
-	// no suitable constructor found, can not deserialize from Object value
-	// (missing default constructor or creator, or perhaps need to add/enable
-	// type information?)
+	@Column(nullable = false)
+	private String steps;
+
 	public Course() {
-
 	}
 
-	public Course(String id, String name, String description, List<String> steps) {
+	public Course(Long id, String name, String description, String steps) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -25,12 +28,15 @@ public class Course {
 		this.steps = steps;
 	}
 
-	public String getId() {
-		return id;
+	public Course(String name, String description, String steps) {
+		super();
+		this.name = name;
+		this.description = description;
+		this.steps = steps;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public Long getId() {
+		return id;
 	}
 
 	public String getDescription() {
@@ -41,7 +47,7 @@ public class Course {
 		return name;
 	}
 
-	public List<String> getSteps() {
+	public String getSteps() {
 		return steps;
 	}
 

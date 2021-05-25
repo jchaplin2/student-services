@@ -1,56 +1,55 @@
 package com.in28minutes.springboot.controller;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
-
-import java.util.Arrays;
-
-import org.junit.Before;
+import com.in28minutes.springboot.model.Course;
+import com.in28minutes.springboot.model.Student;
+import com.in28minutes.springboot.service.StudentService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.RequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import com.in28minutes.springboot.model.Course;
-import com.in28minutes.springboot.service.StudentService;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
 public class StudentControllerUnitTest {
 
-	private MockMvc mockMvc;
+	@Mock
+	private StudentService studentService;
 
-	@Autowired
-	StudentController studentController;
-
-	@Before
-	public void setup() throws Exception {
-		this.mockMvc = standaloneSetup(this.studentController).build();// Standalone context
-	}
+	@InjectMocks
+	private StudentController studentController;
 
 	@Test
-	public void getStudentCourses() throws Exception {
-		mockMvc.perform(get("/students/Student1/courses"))
-				.andExpect(status().isOk())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+	public void test_retrieveCoursesForStudent() throws Exception{
+		Course course1 = new Course("Spring", "10 Steps", "Learn Maven Import Project First Example Second Example");
+		Course course2 = new Course( "Spring MVC", "10 Examples", "Learn Maven Import Project First Example Second Example");
+		Course course3 = new Course("Spring Boot", "6K Students", "Learn Maven Learn Spring Learn Spring MVC First Example Second Example");
+		Course course4 = new Course("Maven", "Most popular maven course on internet!", "Pom.xml Build Life Cycle Parent POM Importing into Eclipse");
+		Student ranga = new Student("Ranga Karanam", "Hiker, Programmer and Architect", new ArrayList<>(Arrays.asList(course1, course2, course3, course4)));
+		Student satish = new Student("Satish T", "Hiker, Programmer and Architect", new ArrayList<>(Arrays.asList(course1, course2, course3, course4)));
+
+		List courses = Arrays.asList(
+				course1,
+				course2,
+				course3,
+				course4
+		);
+
+		Mockito.when(studentService.retrieveCourses(String.valueOf(Mockito.anyString()))).thenReturn(courses);
+		ResponseEntity<List<Course>> returnedListEntity = studentController.retrieveCoursesForStudent("0");
+		assertThat(returnedListEntity.getBody().size()).isEqualTo(4);
 	}
+
 
 }

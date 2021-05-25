@@ -1,28 +1,41 @@
 package com.in28minutes.springboot.model;
 
+import javax.persistence.*;
 import java.util.List;
 
+@Entity
 public class Student {
-	private String id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
+
+	@Column(nullable = false)
 	private String name;
+
+	@Column(nullable = false)
 	private String description;
+
+	@ManyToMany(cascade = CascadeType.PERSIST)
+	@JoinTable(name ="student_courses",
+			joinColumns = @JoinColumn(name = "student_id"),
+			inverseJoinColumns = @JoinColumn(name = "course_id"),
+			uniqueConstraints = {@UniqueConstraint(columnNames={"student_id", "course_id"})}
+	)
 	private List<Course> courses;
 
-	public Student(String id, String name, String description,
-			List<Course> courses) {
+	public Student(){
+
+	}
+
+	public Student(String name, String description, List<Course> courses) {
 		super();
-		this.id = id;
 		this.name = name;
 		this.description = description;
 		this.courses = courses;
 	}
 
-	public String getId() {
+	public Long getId() {
 		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
 	}
 
 	public String getName() {
