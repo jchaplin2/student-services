@@ -1,12 +1,7 @@
 package com.in28minutes.springboot.controller;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
+import com.in28minutes.springboot.model.Course;
 import com.in28minutes.springboot.service.StudentService;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -24,8 +19,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import com.in28minutes.springboot.model.Course;
-import com.in28minutes.springboot.service.StudentServiceUnitTest;
+import static org.junit.Assert.assertEquals;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(value = StudentController.class, secure = false)
@@ -50,7 +46,10 @@ public class StudentControllerIntegrationTest {
                 "/api/students/1/courses/1").accept(
                 MediaType.APPLICATION_JSON);
 
-        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+        MvcResult result = mockMvc.perform(requestBuilder)
+                                    .andExpect(status().isOk())
+                                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                                    .andReturn();
 
         String expected = "{\"id\":1,\"name\":\"Spring\",\"description\":\"10 Steps\"}";
 
