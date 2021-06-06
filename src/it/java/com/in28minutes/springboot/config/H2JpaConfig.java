@@ -3,8 +3,10 @@ package com.in28minutes.springboot.config;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
@@ -31,6 +33,9 @@ public class H2JpaConfig {
     @Autowired
     private Environment env;
 
+    @Value("#{new Boolean('${integration-test.findOnly:true}')}")
+    Boolean findOnlyTest;
+
     @Bean
     public DataSource dataSource() {
         final DriverManagerDataSource dataSource = new DriverManagerDataSource();
@@ -46,13 +51,15 @@ public class H2JpaConfig {
     public DataSourceInitializer dataSourceInitializer(DataSource ds) {
         ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator();
         resourceDatabasePopulator.addScript(new ClassPathResource("/schema-it.sql"));
-        resourceDatabasePopulator.addScript(new ClassPathResource("/data-it.sql"));
+
+        if(findOnlyTest)
+            resourceDatabasePopulator.addScript(new ClassPathResource("/data-it.sql"));
+
         DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
         dataSourceInitializer.setDataSource(ds);
         dataSourceInitializer.setDatabasePopulator(resourceDatabasePopulator);
         return dataSourceInitializer;
     }
-
 
 
 
