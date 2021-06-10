@@ -36,20 +36,7 @@ public class StudentServiceUnitTest {
         Course course4 = new Course("Maven", "Most popular maven course on internet!", "Pom.xml Build Life Cycle Parent POM Importing into Eclipse");
         Student ranga = new Student("Ranga Karanam", "Hiker, Programmer and Architect", new ArrayList<>(Arrays.asList(course1, course2, course3, course4)));
 
-//        List students = Arrays.asList(ranga, satish);
-//        Mockito.when(studentService.retrieveCourses(String.valueOf(Mockito.anyLong()))).thenReturn(
-//                students
-//        );
         Mockito.when(studentRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(ranga));
-//        Optional<Student> optionalStudent = studentRepository.findById(new Long(1));
-//        Student student = optionalStudent.get();
-
-//        Mockito.when(student.getCourses()).thenReturn(Arrays.asList(
-//                course1,
-//                course2,
-//                course3,
-//                course4
-//        ));
 
         List returnedList = studentService.retrieveCourses("1");
         assertThat(returnedList.size()).isEqualTo(4);
